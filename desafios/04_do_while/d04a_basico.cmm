@@ -1,0 +1,20 @@
+// d04a — do cmd while (exp);   o corpo executa ANTES do primeiro teste
+int i;
+int j;
+
+void main() {
+    i = 1;
+    do {
+        write("i = ", i);               // 1, 2, 3
+        i = i + 1;
+    } while (i <= 3);
+
+    // condição falsa já no início: o corpo executa uma vez
+    j = 10;
+    do write("uma vez: ", j); while (j < 5);
+
+    // corpo com comando simples
+    j = 0;
+    do j = j + 2; while (j < 7);
+    write("j = ", j);                   // 8
+}

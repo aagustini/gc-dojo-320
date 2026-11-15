@@ -1,0 +1,21 @@
+// d01b — atribuição dentro de condições e expressão usada como comando.
+int n;
+int k;
+bool fim;
+
+void main() {
+    // decrementa e testa na mesma expressão
+    n = 4;
+    while ((n = n - 1) > 0)
+        write("n = ", n);               // 3, 2, 1
+
+    // atribuição de bool na condição do if
+    k = 5;
+    if (fim = k > 3) write("fim eh verdadeiro");
+    if (!fim) write("nunca");
+
+    // expressão como comando: o valor é calculado e descartado
+    k + 1;
+    k * 2 == 10;
+    write("k = ", k);                   // 5 (inalterado)
+}

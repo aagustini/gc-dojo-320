@@ -1,0 +1,16 @@
+// d07b — ordena três valores lidos usando swap
+int x;
+int y;
+int z;
+
+void main() {
+    read(x);
+    read(y);
+    read(z);
+    if (x > y) swap x, y;
+    if (y > z) swap y, z;
+    if (x > y) swap x, y;
+    write("", x);
+    write("", y);
+    write("", z);
+}

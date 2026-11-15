@@ -1,0 +1,30 @@
+// d04b — conta e soma os dígitos de n (n = 0 também tem um dígito!)
+// e do-while aninhado
+int n;
+int dig;
+int soma;
+int i;
+int j;
+
+void main() {
+    read(n);
+    dig = 0;
+    soma = 0;
+    do {
+        soma = soma + n % 10;
+        dig = dig + 1;
+        n = n / 10;
+    } while (n > 0);
+    write("digitos = ", dig);
+    write("soma = ", soma);
+
+    i = 1;
+    do {
+        j = 1;
+        do {
+            write("", i * 10 + j);      // 11 12 21 22
+            j = j + 1;
+        } while (j <= 2);
+        i = i + 1;
+    } while (i <= 2);
+}

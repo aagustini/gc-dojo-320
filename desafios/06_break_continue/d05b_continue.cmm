@@ -1,0 +1,32 @@
+// d05b — continue: desvia para o TESTE do laço
+//   while:    volta ao teste da condição
+//   do-while: vai ao teste do  while (...)  final
+int i;
+int n;
+
+void main() {
+    // ímpares de 1 a 9
+    i = 0;
+    while (i < 9) {
+        i = i + 1;
+        if (i % 2 == 0) continue;
+        write("impar ", i);
+    }
+
+    // do-while com continue: o teste ainda é feito
+    n = 0;
+    do {
+        n = n + 1;
+        if (n == 2) continue;
+        write("n = ", n);               // 1, 3
+    } while (n < 3);
+
+    // break e continue no mesmo laço: múltiplos de 3 menores que 15
+    i = 0;
+    while (true) {
+        i = i + 1;
+        if (i >= 15) break;
+        if (i % 3 != 0) continue;
+        write("mult3 ", i);             // 3 6 9 12
+    }
+}

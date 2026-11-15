@@ -1,0 +1,21 @@
+// d01a — atribuição como EXPRESSÃO: o valor de  x = e  é o valor de e.
+// Associatividade à direita:  a = b = c = 7  é  a = (b = (c = 7))
+int a;
+int b;
+int c;
+int x;
+int y;
+
+void main() {
+    a = b = c = 7;
+    write("a = ", a);                   // 7
+    write("b = ", b);                   // 7
+    write("c = ", c);                   // 7
+
+    x = (y = 3) + 4;                    // y recebe 3; x recebe 3 + 4
+    write("x = ", x);                   // 7
+    write("y = ", y);                   // 3
+
+    write("valor da atribuicao: ", a = 10);   // 10
+    write("a = ", a);                   // 10
+}

@@ -1,0 +1,21 @@
+// d07a — swap a, b;   troca os valores de duas variáveis do mesmo tipo
+int a;
+int b;
+bool p;
+bool q;
+
+void main() {
+    a = 1;
+    b = 2;
+    swap a, b;
+    write("a = ", a);                   // 2
+    write("b = ", b);                   // 1
+
+    swap a, a;                          // trocar consigo mesma não muda nada
+    write("a = ", a);                   // 2
+
+    p = true;
+    q = false;
+    swap p, q;
+    if (q && !p) write("bool trocado");
+}

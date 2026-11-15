@@ -1,0 +1,10 @@
+b = 3
+a = 3
+c = 8
+i = 0
+i = 1
+i = 2
+desce 2
+desce 1
+desce 0
+i = -1

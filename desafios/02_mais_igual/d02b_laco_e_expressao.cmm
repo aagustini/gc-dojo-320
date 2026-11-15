@@ -1,0 +1,24 @@
+// d02b — += em laço e como expressão (o valor é o novo valor da variável)
+int soma;
+int i;
+int a;
+int b;
+
+void main() {
+    soma = 0;
+    i = 1;
+    while (i <= 10) {
+        soma += i;
+        i += 1;
+    }
+    write("soma 1..10 = ", soma);       // 55
+
+    a = 1;
+    b = (a += 4) * 2;                   // a passa a 5; b = 5 * 2
+    write("a = ", a);                   // 5
+    write("b = ", b);                   // 10
+
+    a += b += 1;                        // à direita: b = 11; a = 5 + 11
+    write("a = ", a);                   // 16
+    write("b = ", b);                   // 11
+}

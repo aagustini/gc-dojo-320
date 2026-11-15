@@ -1,0 +1,15 @@
+// d03a — pré e pós incremento/decremento
+//   x++ : o valor da expressão é o valor ANTIGO de x
+//   ++x : o valor da expressão é o valor NOVO de x
+int i;
+
+void main() {
+    i = 5;
+    write("i++ = ", i++);               // 5
+    write("i   = ", i);                 // 6
+    write("++i = ", ++i);               // 7
+    write("i-- = ", i--);               // 7
+    write("i   = ", i);                 // 6
+    write("--i = ", --i);               // 5
+    write("i   = ", i);                 // 5
+}

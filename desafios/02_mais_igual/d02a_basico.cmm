@@ -1,0 +1,16 @@
+// d02a — operador +=     ident += exp   equivale a   ident = ident + (exp)
+int x;
+
+void main() {
+    x = 10;
+    x += 5;
+    write("x = ", x);                   // 15
+    x += x;
+    write("x = ", x);                   // 30
+    x += -40;
+    write("x = ", x);                   // -10
+    x += 2 * 3;                         // x = x + (2 * 3)
+    write("x = ", x);                   // -4
+    x += 10 - 6;                        // x = x + (10 - 6), não (x + 10) - 6
+    write("x = ", x);                   // 0
+}
