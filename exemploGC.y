@@ -33,11 +33,12 @@
 
 %token ID, INT, FLOAT, BOOL, NUM, LIT, VOID, MAIN, READ, WRITE, RETURN
 %token IF, ELSE, WHILE, TRUE, FALSE
-%token EQ, LEQ, GEQ, NEQ, AND, OR
+%token EQ, LEQ, GEQ, NEQ, AND, OR, PEQUAL, INC, DEC
 
 %nonassoc IFX
 %nonassoc ELSE
 
+%right '=', PEQUAL
 %right '?' ':'
 %left OR
 %left AND
@@ -45,6 +46,7 @@
 %left '+' '-'
 %left '*' '/' '%'
 %right '!' UMINUS
+%nonassoc INC DEC
 
 %type <sval> ID LIT NUM
 %type <ival> type
@@ -109,7 +111,7 @@ lcmd    : lcmd cmd
 cmd     : '{' lcmd '}'
         | ';'
 
-        | ID '=' exp ';'                   { gcAtribui($1); }       // atribuição: COMANDO
+        | exp ';'                   
 
         | ID '('                           { iniciaChamada($1); }   // chamada como comando
           lArgOpc ')' ';'                  { gcChamada(true); }
@@ -119,7 +121,7 @@ cmd     : '{' lcmd '}'
         | WRITE '(' LIT ','                { gcWriteLit($3); }
                          exp ')' ';'       { gcWriteExp(); gcWriteln(); }
         | READ '(' ID ')' ';'              { gcRead($3); }
-
+        | SWAP ID ',' ID ';'               { gcSwap($2,$4);}
         | RETURN exp ';'                   { gcReturn(true); }
         | RETURN ';'                       { gcReturn(false); }
 
@@ -146,17 +148,23 @@ exp     : NUM                              { gera("PUSHL $%s", $1); }
         | TRUE                             { gera("PUSHL $1"); }
         | FALSE                            { gera("PUSHL $0"); }
         | ID                               { gcCarregaVar($1); }
-        | ID '('                           { iniciaChamada($1); }
-          lArgOpc ')'                      { gcChamada(false); }
         | '(' exp ')'
         | '!' exp                          { gcExpNot(); }
         | '-' exp  %prec UMINUS            { gcExpNeg(); }
+
+        | ID '=' exp                       { gcAtribui($1); }       // atribuição: COMANDO
+        | ID PEQUAL exp                       { gcAtribuiPq($1); } 
 
         | exp '+' exp                      { gcExpArit('+'); }
         | exp '-' exp                      { gcExpArit('-'); }
         | exp '*' exp                      { gcExpArit('*'); }
         | exp '/' exp                      { gcExpArit('/'); }
         | exp '%' exp                      { gcExpArit('%'); }
+        | ID INC                           { gcINC($1);}
+        | ID DEC                           { gcDEC($1);}
+        | INC ID                           { gcINCPre($2);}
+        | DEC ID                           { gcDECPre($2);}
+
 
         | exp '>' exp                      { gcExpRel('>'); }
         | exp '<' exp                      { gcExpRel('<'); }
@@ -420,6 +428,83 @@ lArg    : lArg ',' exp                     { pArgs.push(pArgs.pop() + 1); }
     if (v == null || !acessoImplementado(v)) return;
     gera("POPL %%EDX");
     gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL %%EDX");
+  }
+
+  void gcAtribuiPq(String id) {
+    TS_entry v = buscaVar(id);
+    if (v == null || !acessoImplementado(v)) return;
+
+    gera("PUSHL %s", v.getOperando());
+    gcExpArit('+');
+
+    gera("POPL %%EDX");
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL %%EDX");
+  }
+
+  void gcINCPre(String id) {
+    TS_entry v = buscaVar(id);
+    if (v == null || !acessoImplementado(v)) return;
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL $1");
+    gcExpArit('+');
+  }
+
+  void gcINC(String id) {
+    TS_entry v = buscaVar(id);
+    if (v == null || !acessoImplementado(v)) return;
+
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL $1");
+    gcExpArit('+');
+    gera("POPL %%EDX");
+  }
+  void gcDEC(String id) {
+    TS_entry v = buscaVar(id);
+    if (v == null || !acessoImplementado(v)) return;
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL $1");
+    gcExpArit('-');
+    gera("POPL %%EDX");
+  }
+
+  void gcDECPre(String id) {
+    TS_entry v = buscaVar(id);
+    if (v == null || !acessoImplementado(v)) return;
+    
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL $1");
+    gcExpArit('-');
+  }
+
+  void gcAtribuiMq(String id) {
+    TS_entry v = buscaVar(id);
+    if (v == null || !acessoImplementado(v)) return;
+
+    gera("PUSHL %s", v.getOperando());
+    gcExpArit('-');
+
+    gera("POPL %%EDX");
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL %%EDX");
+  }
+
+    void gcSwap(String id, String id2) {
+    TS_entry v = buscaVar(id);
+    TS_entry v2 = buscaVar(id2);
+    if (v == null || !acessoImplementado(v)) return;
+    if (v2 == null || !acessoImplementado(v2)) return;
+
+    gera("PUSHL %s", v.getOperando());
+    gera("PUSHL %s", v2.getOperando());
+
+    gera("POPL %%EDX");
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("POPL %%EDX");
+    gera("MOVL %%EDX, %s", v2.getOperando());
   }
 
   void gcWriteLit(String s) {
