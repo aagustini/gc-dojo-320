@@ -1,0 +1,31 @@
+// d06b — partes omitidas, laço aninhado e continue no for
+// condição omitida = verdadeira (precisa de break para sair)
+// continue no for desvia para o PASSO (não para o teste)
+int i;
+int j;
+int c;
+
+void main() {
+    i = 0;
+    for (;;) {
+        if (i == 3) break;
+        write("sem nada: ", i);         // 0, 1, 2
+        i = i + 1;
+    }
+
+    for (; i < 5;) i = i + 1;
+    write("i = ", i);                   // 5
+
+    // tabuada 2x2 com for aninhado
+    for (i = 1; i <= 2; i = i + 1)
+        for (j = 1; j <= 2; j = j + 1)
+            write("", i * j);           // 1 2 2 4
+
+    // continue: o passo i = i + 1 precisa ser executado
+    c = 0;
+    for (i = 0; i < 10; i = i + 1) {
+        if (i % 2 == 1) continue;
+        c = c + 1;
+    }
+    write("pares em 0..9: ", c);        // 5
+}

@@ -19,7 +19,8 @@ for f in "$@"; do
     if diff -q "$b.saida" "$b.esperado" > /dev/null 2>&1; then
         echo "  ok     $f"; ok=$((ok + 1))
     else
-        echo "  FALHOU $f   (compare $b.saida com $b.esperado)"; falhas=$((falhas + 1))
+#        echo "  FALHOU $f   (compare $b.saida com $b.esperado)"; falhas=$((falhas + 1))
+        echo "  FALHOU $f"; falhas=$((falhas + 1))
     fi
 done
 echo "  -> $ok ok, $falhas falha(s)"

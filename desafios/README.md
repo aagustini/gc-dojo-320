@@ -22,8 +22,29 @@ esperado de cada `write`.
 | `02_mais_igual` | operador `+=` | `x += e` ≡ `x = x + (e)`; é expressão, com o novo valor de `x` |
 | `03_incremento` | `++` e `--`, pré e pós | `x++` vale o valor antigo, `++x` vale o novo; só para variáveis `int` |
 | `04_do_while` | `do-while` | `do cmd while (exp);`, o corpo executa ao menos uma vez |
-| `05_swap` | `swap` | `swap a, b;` troca os valores de duas variáveis do mesmo tipo |
-| `06_break_continue` | `break` e `continue` | atuam no laço mais interno; `continue` vai ao teste (`while`, `do-while`) |
+| `05_break_continue` | `break` e `continue` | atuam no laço mais interno; `continue` vai ao teste (`while`, `do-while`) |
+| `06_for` | `for` estilo C | `for (exp? ; exp? ; exp?) cmd`; condição omitida = verdadeira; `continue` vai ao passo |
+| `07_swap` | `swap` | `swap a, b;` troca os valores de duas variáveis do mesmo tipo |
+| `08_times` | `times` | `times exp do cmd` executa `cmd` `exp` vezes; `exp` é avaliada **uma vez**; `exp <= 0` não executa |
+| `09_aif` | *arithmetic if* | ver abaixo |
+
+### Sintaxe proposta para o *arithmetic if*
+
+Inspirada no IF aritmético do FORTRAN (`IF (e) l1, l2, l3`), mas com comandos
+no lugar de rótulos:
+
+```c
+aif (exp)
+    neg:  cmd        // exp <  0
+    zero: cmd        // exp == 0
+    pos:  cmd        // exp >  0
+```
+
+- `aif`, `neg`, `zero` e `pos` são palavras reservadas; os três ramos são
+  obrigatórios e aparecem nessa ordem.
+- `exp` é avaliada uma vez e exatamente um dos três comandos é executado.
+- Cada ramo é um `cmd` qualquer: um comando simples, um bloco `{ }` ou outro `aif`.
+- Uso típico: `aif (a - b)` compara dois valores com um único teste.
 
 ## Ordem sugerida e dependências
 
@@ -32,7 +53,7 @@ esperado de cada `write`.
 2. **04** e **05** juntos: `break` e `continue` precisam saber os rótulos do
    laço mais interno, que pode ser `while`, `do-while`, `for` ou `times`.
 3. **06** usa 01, e o teste `d06b` usa `break` (05).
-
+4. **07**, **08** e **09** são independentes.
 
 ## Dicas de implementação
 
@@ -50,8 +71,17 @@ esperado de cada `write`.
   ou depois do `PUSHL`.
 - **`break` / `continue`**: uma pilha com os rótulos de *continuar* e de *sair*
   de cada laço aberto; `break` ou `continue` fora de laço é erro semântico.
+- **`for`**: em uma passagem, o passo aparece **antes** do corpo no fonte, mas
+  executa **depois**. Uma solução usa quatro rótulos:
+  `teste: cond; JE fim; JMP corpo; passo: ...; JMP teste; corpo: cmd; JMP passo; fim:`
+- **`times`**: o contador pode ficar **no topo da pilha** durante o laço
+  (`CMPL $0, (%ESP)` · `JLE fim` · `DECL (%ESP)`), o que dispensa variáveis
+  temporárias e funciona com `times` aninhados. Lembre de remover o contador
+  no fim (inclusive quando se sai por `break`).
 - **`swap`**: na máquina de pilha bastam quatro instruções
   (`PUSHL a` · `PUSHL b` · `POPL a` · `POPL b`).
+- **`aif`**: após calcular `exp`: `POPL %EAX` · `CMPL $0, %EAX` · `JL neg` · `JE zero` · `JMP pos`.
+  Cada ramo termina com `JMP fim`.
 
 ## Verificações semânticas esperadas
 
@@ -61,3 +91,9 @@ Além da geração de código, o compilador deve rejeitar:
 - `++`, `--` ou `+=` aplicados a variável `bool`, ou a algo que não é variável (`3++`);
 - `swap` entre variáveis de tipos diferentes, ou com algo que não é variável.
 
+## Observação sobre `exemplos/erros`
+
+Os testes `e01` a `e09` de `exemplos/erros` verificam que o código inicial
+**rejeita** as construções acima. Depois de implementada cada funcionalidade,
+o teste correspondente deixa de produzir erro: isso é o esperado, e esses
+testes podem ser removidos ou atualizados.

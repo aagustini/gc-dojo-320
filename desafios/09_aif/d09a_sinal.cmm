@@ -1,0 +1,22 @@
+// d09a — "aritmetic if" (inspirado no IF aritmético do FORTRAN)
+//
+//     aif (exp)
+//         neg:  cmd      executado se exp <  0
+//         zero: cmd      executado se exp == 0
+//         pos:  cmd      executado se exp >  0
+//
+// exp é avaliada uma vez; exatamente um dos três comandos é executado.
+int v;
+
+void main() {
+    v = -5;
+    aif (v) neg: write("negativo"); zero: write("zero"); pos: write("positivo");
+
+    v = 0;
+    aif (v) neg: write("negativo"); zero: write("zero"); pos: write("positivo");
+
+    aif (v + 7)
+        neg:  write("negativo");
+        zero: write("zero");
+        pos:  write("positivo");
+}

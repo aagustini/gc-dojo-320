@@ -1,0 +1,22 @@
+// d08a — times exp do cmd     executa cmd exp vezes
+// (exp <= 0: cmd não executa)
+int n;
+int c;
+
+void main() {
+    times 3 do write("oi");
+
+    times 0 do write("nunca");
+    times -2 do write("nunca");
+
+    n = 4;
+    c = 0;
+    times n * 2 do c = c + 1;
+    write("c = ", c);                   // 8
+
+    times 2 do {
+        write("bloco");
+        c = c - 1;
+    }
+    write("c = ", c);                   // 6
+}

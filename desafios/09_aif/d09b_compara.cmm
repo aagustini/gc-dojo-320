@@ -1,0 +1,31 @@
+// d09b — aif para comparar dois números (aif (a - b)), com blocos,
+// dentro de um laço e aninhado
+int a;
+int b;
+int i;
+int menores;
+
+void main() {
+    i = 0;
+    menores = 0;
+    while (i < 3) {
+        read(a);
+        read(b);
+        aif (a - b)
+            neg:  { write("menor: ", a); menores = menores + 1; }
+            zero:   write("iguais: ", a);
+            pos:  { write("maior: ", a); }
+        i = i + 1;
+    }
+    write("menores = ", menores);
+
+    // aif aninhado: classifica a em relação a 0 e a 10
+    a = 7;
+    aif (a)
+        neg:  write("abaixo de 0");
+        zero: write("zero");
+        pos:  aif (a - 10)
+                  neg:  write("entre 1 e 9");
+                  zero: write("dez");
+                  pos:  write("acima de 10");
+}

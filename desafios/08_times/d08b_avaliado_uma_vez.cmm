@@ -1,0 +1,19 @@
+// d08b — exp é avaliada UMA vez, antes da primeira repetição;
+// alterar as variáveis da expressão dentro do laço não muda o número de
+// repetições.  Inclui times aninhado.
+int n;
+int c;
+
+void main() {
+    n = 3;
+    times n do {
+        write("n = ", n);               // 3, 4, 5
+        n = n + 1;
+    }
+
+    c = 0;
+    times 3 do
+        times 2 do
+            c = c + 1;
+    write("3 x 2 = ", c);               // 6
+}
