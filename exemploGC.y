@@ -32,7 +32,7 @@
 %}
 
 %token ID, INT, FLOAT, BOOL, NUM, LIT, VOID, MAIN, READ, WRITE, RETURN
-%token IF, ELSE, WHILE, TRUE, FALSE
+%token IF, ELSE, WHILE, TRUE, FALSE, BREAK, CONTINUE, DO, SWAP
 %token EQ, LEQ, GEQ, NEQ, AND, OR, PEQUAL, INC, DEC
 
 %nonassoc IFX
@@ -129,11 +129,18 @@ cmd     : '{' lcmd '}'
                                              gcDesviaSeFalso(pRot.peek()); }
           cmd restoIf
 
-        | WHILE                            { pRot.push(novosRotulos(2));
-                                             geraRot(pRot.peek()); }       // início
-          '(' exp ')'                      { gcDesviaSeFalso(pRot.peek() + 1); }  // saída
-          cmd                              { gcJmp(pRot.peek());
-                                             geraRot(pRot.pop() + 1); }
+        | WHILE                            { pRotRep.push(novosRotulos(2));
+                                          
+                                             geraRot(pRotRep.peek()); }       // início
+          '(' exp ')'                      { gcDesviaSeFalso(pRotRep.peek() + 1); }  // saída
+          cmd                              { gcJmp(pRotRep.peek());
+                                             geraRot(pRotRep.pop() + 1); }
+        | DO {pRotRep.push(novosRotulos(2)); geraRot(pRotRep.peek());}
+         cmd WHILE '(' exp ')' {gcDesviaSeVerdadeiro(pRotRep.peek());
+         geraRot(pRotRep.pop()+1);}
+
+        | BREAK ';'                           {gcBreak();}
+        | CONTINUE ';'                        {gcContinue();}
         ;
 
 restoIf : ELSE                             { gcJmp(pRot.peek() + 1);
@@ -181,6 +188,8 @@ exp     : NUM                              { gera("PUSHL $%s", $1); }
           exp                              { gcJmp(pRot.peek() + 1);
                                              geraRot(pRot.peek()); }
           ':' exp                          { geraRot(pRot.pop() + 1); }
+       
+
         ;
 
 lArgOpc : lArg
@@ -411,6 +420,8 @@ lArg    : lArg ',' exp                     { pArgs.push(pArgs.pop() + 1); }
 
   private int proxRot = 1;
   private final Stack<Integer> pRot = new Stack<>();   // if, while e ?: (2 rótulos cada)
+  private final Stack<Integer> pRotRep = new Stack<>();   // if, while e ?: (2 rótulos cada)
+
 
   String rot(int r) { return String.format("rot_%02d", r); }
 
@@ -420,6 +431,12 @@ lArg    : lArg ',' exp                     { pArgs.push(pArgs.pop() + 1); }
     gera("POPL %%EAX");
     gera("CMPL $0, %%EAX");
     gera("JE %s", rot(r));
+  }
+
+  void gcDesviaSeVerdadeiro(int r) {
+    gera("POPL %%EAX");
+    gera("CMPL $0, %%EAX");
+    gera("JNE %s", rot(r));
   }
 
   /** id = exp ;  — comando: o valor é desempilhado e armazenado. */
@@ -446,38 +463,55 @@ lArg    : lArg ',' exp                     { pArgs.push(pArgs.pop() + 1); }
   void gcINCPre(String id) {
     TS_entry v = buscaVar(id);
     if (v == null || !acessoImplementado(v)) return;
-    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL %s", v.getOperando());
     gera("PUSHL $1");
     gcExpArit('+');
+    gera("POPL %%EDX");
+    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL %%EDX");
+
   }
 
   void gcINC(String id) {
     TS_entry v = buscaVar(id);
     if (v == null || !acessoImplementado(v)) return;
 
-    gera("MOVL %%EDX, %s", v.getOperando());
-    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL %s", v.getOperando());
+    gera("PUSHL %s", v.getOperando());
     gera("PUSHL $1");
     gcExpArit('+');
     gera("POPL %%EDX");
+    gera("MOVL %%EDX, %s", v.getOperando());
+
   }
   void gcDEC(String id) {
     TS_entry v = buscaVar(id);
     if (v == null || !acessoImplementado(v)) return;
-    gera("MOVL %%EDX, %s", v.getOperando());
-    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL %s", v.getOperando());
+    gera("PUSHL %s", v.getOperando());
     gera("PUSHL $1");
     gcExpArit('-');
     gera("POPL %%EDX");
+    gera("MOVL %%EDX, %s", v.getOperando());
   }
 
   void gcDECPre(String id) {
     TS_entry v = buscaVar(id);
     if (v == null || !acessoImplementado(v)) return;
     
-    gera("MOVL %%EDX, %s", v.getOperando());
+    gera("PUSHL %s", v.getOperando());
     gera("PUSHL $1");
     gcExpArit('-');
+    gera("POPL %%EDX");
+    gera("MOVL %%EDX, %s", v.getOperando());
+  }
+
+  void gcBreak(){
+    gera("JMP %s", pRotRep.peek()+1);
+  }
+
+  void gcContinue(){
+    gera("JMP %s", pRotRep.peek());
   }
 
   void gcAtribuiMq(String id) {

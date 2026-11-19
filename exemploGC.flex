@@ -81,6 +81,9 @@ else   { return Parser.ELSE; }
 true   { return Parser.TRUE; }
 false   { return Parser.FALSE; }
 return { return Parser.RETURN; }
+break { return Parser.BREAK;}
+continue { return Parser.CONTINUE;}
+do { return Parser.DO;}
 swap {return Parser.SWAP;}
 
 

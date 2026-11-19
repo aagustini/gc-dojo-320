@@ -1,2 +1,5 @@
-Erro: erro sintatico proximo de '{'  linha: 7
-1 erro(s) - codigo nao gerado.
+i = 1
+i = 2
+i = 3
+uma vez: 10
+j = 8
