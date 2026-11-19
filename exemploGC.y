@@ -507,11 +507,14 @@ lArg    : lArg ',' exp                     { pArgs.push(pArgs.pop() + 1); }
   }
 
   void gcBreak(){
-    gera("JMP %s", pRotRep.peek()+1);
+// gera("JMP %s", pRotRep.peek()+1);  -> JMP 2
+   gcJmp(pRotRep.peek()+1);        // -> JMP JMP rot_02
+
   }
 
   void gcContinue(){
-    gera("JMP %s", pRotRep.peek());
+// gera("JMP %s", pRotRep.peek());
+   gcJmp(pRotRep.peek());
   }
 
   void gcAtribuiMq(String id) {
